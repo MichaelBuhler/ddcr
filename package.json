@@ -1,6 +1,6 @@
 {
   "name": "ddcr",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "a directory diff/change renderer",
   "main": "index.js",
   "scripts": {
