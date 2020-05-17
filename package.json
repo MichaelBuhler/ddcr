@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/MichaelBuhler/ddcr/issues"
   },
-  "homepage": "https://github.com/MichaelBuhler/ddcr#readme"
+  "homepage": "https://github.com/MichaelBuhler/ddcr#readme",
+  "dependencies": {
+    "change-case": "^4.1.1"
+  }
 }
