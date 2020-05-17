@@ -1,5 +1,5 @@
 
-const child_process = require('child_process');
+const child_process = require('child_process')
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
@@ -38,6 +38,7 @@ async function getConsolidatedFileChangesBetweenDirectories (directories, startW
 
 async function getFileChangesBetweenDirectories (a, b) {
   const diff = await getDiff(a, b)
+  if (!diff) return []
   return diff.split('\n').map(diffLine => {
     return parseFileChangeFromDiffLine(diffLine, `${a}${path.sep}`, `${b}${path.sep}`)
   }).sort(fileChangesSorter)
