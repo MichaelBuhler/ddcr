@@ -1,0 +1,29 @@
+{
+  "name": "ddcr",
+  "version": "0.0.1",
+  "description": "a directory diff/change renderer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MichaelBuhler/ddcr.git"
+  },
+  "keywords": [
+    "dir",
+    "directory",
+    "diff",
+    "change",
+    "changes",
+    "compare",
+    "render",
+    "renderer"
+  ],
+  "author": "Michael Buhler <michael@michaelbuhler.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MichaelBuhler/ddcr/issues"
+  },
+  "homepage": "https://github.com/MichaelBuhler/ddcr#readme"
+}
