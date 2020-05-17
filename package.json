@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/MichaelBuhler/ddcr#readme",
   "dependencies": {
-    "change-case": "^4.1.1"
+    "change-case": "^4.1.1",
+    "prettier": "^2.0.5"
   }
 }

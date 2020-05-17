@@ -5,6 +5,7 @@ const path = require('path')
 const os = require('os')
 
 const { capitalCase } = require('change-case')
+const prettier = require('prettier')
 
 const DEV_NULL = '/dev/null'
 const FILE_CHANGE_TYPES = {
@@ -185,8 +186,13 @@ const HtmlRenderer = (function () {
       color: #888888;
     }`
 
+  const PRETTIER_OPTIONS = {
+    parser: 'html',
+    printWidth: 120
+  }
+
   function renderDocument (consolidatedFileChanges, groupByFolder = false) {
-    return `<!doctype html>
+    return prettier.format(`<!doctype html>
     <html lang="en">
       <head>
         <title>${DEFAULT_TITLE}</title>
@@ -198,7 +204,7 @@ const HtmlRenderer = (function () {
         <h1>${DEFAULT_TITLE}</h1>
         ${ renderTable(consolidatedFileChanges, groupByFolder) }
       </body>
-    </html>`
+    </html>`, PRETTIER_OPTIONS)
   }
 
   function renderTable (consolidatedFileChanges, groupByFolder) {
@@ -237,9 +243,7 @@ const HtmlRenderer = (function () {
 
   function renderConsolidatedFileChange (consolidatedFileChange) {
     return `<tr>
-      <td class="filename">
-        ${consolidatedFileChange.filename}
-      </td>
+      <td class="filename">${consolidatedFileChange.filename}</td>
       ${ consolidatedFileChange.changes.map(renderChange).join('\n') }
     </tr>`
   }
@@ -254,14 +258,14 @@ const HtmlRenderer = (function () {
   }
 
   function renderAdditions (additions, changeType) {
-    return `<td class="additions ${changeType.toLowerCase()}">
-      <span class="${ additions > 0 ? 'some-additions' : 'no-additions' }">${additions||0}</span>
+    return `<td class="additions ${changeType.toLowerCase()}">\
+      <span class="${ additions > 0 ? 'some-additions' : 'no-additions' }">${additions||0}</span>\
     </td>`
   }
 
   function renderDeletions (deletions, changeType) {
-    return `<td class="deletions ${changeType.toLowerCase()}">
-      <span class="${ deletions > 0 ? 'some-deletions' : 'no-deletions' }">${deletions||0}</span>
+    return `<td class="deletions ${changeType.toLowerCase()}">\
+      <span class="${ deletions > 0 ? 'some-deletions' : 'no-deletions' }">${deletions||0}</span>\
     </td>`
   }
 
