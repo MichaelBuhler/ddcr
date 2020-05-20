@@ -61,84 +61,82 @@ const PRETTIER_OPTIONS = {
   printWidth: 120
 }
 
-function renderDocument (consolidatedFileChanges, groupByFolder = false) {
-  return prettier.format(`<!doctype html>
-  <html lang="en">
-    <head>
-      <title>${DEFAULT_TITLE}</title>
-      <style> 
-        ${ DEFAULT_STYLES }
-      </style>
-    </head>
-    <body>
-      <h1>${DEFAULT_TITLE}</h1>
-      ${ renderTable(consolidatedFileChanges, groupByFolder) }
-    </body>
-  </html>`, PRETTIER_OPTIONS)
-}
+module.exports = class HtmlRenderer {
+  static renderDocument (consolidatedFileChanges, groupByFolder = false) {
+    return prettier.format(`<!doctype html>
+    <html lang="en">
+      <head>
+        <title>${DEFAULT_TITLE}</title>
+        <style> 
+          ${ DEFAULT_STYLES }
+        </style>
+      </head>
+      <body>
+        <h1>${DEFAULT_TITLE}</h1>
+        ${ HtmlRenderer.renderTable(consolidatedFileChanges, groupByFolder) }
+      </body>
+    </html>`, PRETTIER_OPTIONS)
+  }
 
-function renderTable (consolidatedFileChanges, groupByFolder) {
-  if (groupByFolder) {
-    const consolidatedFileChangesByFolder = {}
-    const consolidatedFileChangesInRootFolder = []
-    consolidatedFileChanges.forEach(consolidatedFileChange => {
-      const index = consolidatedFileChange.filename.indexOf(path.sep);
-      if ( index === -1 ) {
-        consolidatedFileChangesInRootFolder.push(consolidatedFileChange)
-      } else {
-        const folder = consolidatedFileChange.filename.substring(0, index)
-        consolidatedFileChange.filename = consolidatedFileChange.filename.substring(index+1)
-        consolidatedFileChangesByFolder[folder] = consolidatedFileChangesByFolder[folder] || []
-        consolidatedFileChangesByFolder[folder].push(consolidatedFileChange)
-      }
-    })
+  static renderTable (consolidatedFileChanges, groupByFolder) {
+    if (groupByFolder) {
+      const consolidatedFileChangesByFolder = {}
+      const consolidatedFileChangesInRootFolder = []
+      consolidatedFileChanges.forEach(consolidatedFileChange => {
+        const index = consolidatedFileChange.filename.indexOf(path.sep);
+        if ( index === -1 ) {
+          consolidatedFileChangesInRootFolder.push(consolidatedFileChange)
+        } else {
+          const folder = consolidatedFileChange.filename.substring(0, index)
+          consolidatedFileChange.filename = consolidatedFileChange.filename.substring(index+1)
+          consolidatedFileChangesByFolder[folder] = consolidatedFileChangesByFolder[folder] || []
+          consolidatedFileChangesByFolder[folder].push(consolidatedFileChange)
+        }
+      })
+      return `<table>
+        ${ consolidatedFileChangesInRootFolder.map(HtmlRenderer.renderConsolidatedFileChange).join('\n') }
+        ${ Object.entries(consolidatedFileChangesByFolder).map(([folder, consolidatedFileChanges]) => {
+        return HtmlRenderer.renderSection(capitalCase(folder), consolidatedFileChanges)
+      }).join('\n') }
+      </table>`
+    }
     return `<table>
-      ${ consolidatedFileChangesInRootFolder.map(renderConsolidatedFileChange).join('\n') }
-      ${ Object.entries(consolidatedFileChangesByFolder).map(([folder, consolidatedFileChanges]) => {
-      return renderSection(capitalCase(folder), consolidatedFileChanges)
-    }).join('\n') }
+      ${ consolidatedFileChanges.map(HtmlRenderer.renderConsolidatedFileChange).join('\n') }
     </table>`
   }
-  return `<table>
-    ${ consolidatedFileChanges.map(renderConsolidatedFileChange).join('\n') }
-  </table>`
-}
 
-function renderSection (sectionName, consolidatedFileChanges) {
-  return `<tr>
-    <td><h3>${sectionName}</h3></td>
-  </tr>
-  ${ consolidatedFileChanges.map(renderConsolidatedFileChange).join('\n') }`
-}
-
-function renderConsolidatedFileChange (consolidatedFileChange) {
-  return `<tr>
-    <td class="filename">${consolidatedFileChange.filename}</td>
-    ${ consolidatedFileChange.changes.map(renderChange).join('\n') }
-  </tr>`
-}
-
-function renderChange (change) {
-  if (!change) {
-    return '<td class="change null" colspan="3"/>'
+  static renderSection (sectionName, consolidatedFileChanges) {
+    return `<tr>
+      <td><h3>${sectionName}</h3></td>
+    </tr>
+    ${ consolidatedFileChanges.map(HtmlRenderer.renderConsolidatedFileChange).join('\n') }`
   }
-  return `<td class="change ${change.type.toLowerCase()}">${PARTICIPLE_MAP.get(change.type)}</td>
-  ${ renderAdditions(change.additions, change.type) }
-  ${ renderDeletions(change.deletions, change.type) }`
-}
 
-function renderAdditions (additions, changeType) {
-  return `<td class="additions ${changeType.toLowerCase()}">\
-    <span class="${ additions > 0 ? 'some-additions' : 'no-additions' }">${additions||0}</span>\
-  </td>`
-}
+  static renderConsolidatedFileChange (consolidatedFileChange) {
+    return `<tr>
+      <td class="filename">${consolidatedFileChange.filename}</td>
+      ${ consolidatedFileChange.changes.map(HtmlRenderer.renderChange).join('\n') }
+    </tr>`
+  }
 
-function renderDeletions (deletions, changeType) {
-  return `<td class="deletions ${changeType.toLowerCase()}">\
-    <span class="${ deletions > 0 ? 'some-deletions' : 'no-deletions' }">${deletions||0}</span>\
-  </td>`
-}
+  static renderChange (change) {
+    if (!change) {
+      return '<td class="change null" colspan="3"/>'
+    }
+    return `<td class="change ${change.type.toLowerCase()}">${PARTICIPLE_MAP.get(change.type)}</td>
+    ${ HtmlRenderer.renderAdditions(change.additions, change.type) }
+    ${ HtmlRenderer.renderDeletions(change.deletions, change.type) }`
+  }
 
-module.exports = {
-  renderDocument
+  static renderAdditions (additions, changeType) {
+    return `<td class="additions ${changeType.toLowerCase()}">\
+      <span class="${ additions > 0 ? 'some-additions' : 'no-additions' }">${additions||0}</span>\
+    </td>`
+  }
+
+  static renderDeletions (deletions, changeType) {
+    return `<td class="deletions ${changeType.toLowerCase()}">\
+      <span class="${ deletions > 0 ? 'some-deletions' : 'no-deletions' }">${deletions||0}</span>\
+    </td>`
+  }
 }

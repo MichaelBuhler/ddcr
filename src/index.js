@@ -1,11 +1,10 @@
 
-const {
-  getConsolidatedFileChangesBetweenDirectories
-} = require('./Differ')
+const Differ = require('./Differ')
 
 const HtmlRenderer = require('./HtmlRenderer')
 
 module.exports = {
-  getConsolidatedFileChangesBetweenDirectories,
+  getConsolidatedFileChangesBetweenDirectories: Differ.getConsolidatedFileChangesBetweenDirectories,
+  Differ,
   HtmlRenderer
 }
